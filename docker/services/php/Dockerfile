@@ -26,7 +26,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     sudo \
     libicu-dev \
-    libmagickwand-dev --no-install-recommends
+    libmagickwand-dev --no-install-recommends \
+     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+     && apt-get install -y nodejs \
+     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 # Clear cache
@@ -39,7 +42,7 @@ RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl gd intl
 RUN docker-php-ext-configure intl
 RUN docker-php-ext-configure gd --enable-gd --with-freetype=/usr/include/ --with-webp=/usr/include/  --with-jpeg=/usr/include/
 RUN docker-php-ext-install -j$(nproc) gd
-
+#RUN docker-php-ext-enable imagick
 # Install composer
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
