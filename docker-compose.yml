@@ -8,17 +8,17 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./docker/php/Dockerfile
-    container_name: ${SERVICE_NAME}_php
+      dockerfile: ./docker/services/php/Dockerfile
+    container_name: ${DOCKER_SERVICES_NAME}_php
     restart: unless-stopped
     tty: true
     environment:
-      SERVICE_NAME: app
+      DOCKER_SERVICES_NAME: app
       SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
-      - ./src/:/var/www
-      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./:/var/www
+      - ./docker/services/php/php.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - laravel
     depends_on:
@@ -28,14 +28,14 @@ services:
   #Nginx Service
   webserver:
     image: nginx:alpine
-    container_name: ${SERVICE_NAME}_nginx
+    container_name: ${DOCKER_SERVICES_NAME}_nginx
     restart: unless-stopped
     tty: true
     ports:
       - "5000:80"
     volumes:
-      - ./src/:/var/www
-      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./:/var/www
+      - ./docker/services/nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - laravel
     depends_on:
@@ -44,7 +44,7 @@ services:
 
   #MySQL Service
   db:
-    container_name: ${SERVICE_NAME}_db
+    container_name: ${DOCKER_SERVICES_NAME}_db
     image: mysql/mysql-server:8.0.23
     restart: unless-stopped
     ports:
@@ -55,9 +55,9 @@ services:
       MYSQL_USER: user_db
       MYSQL_PASSWORD: password
       SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+      DOCKER_SERVICES_NAME: mysql
     volumes:
-      - ./docker/mysql/data:/var/lib/mysql/
-      - ./docker/mysql/conf/my.cnf:/etc/mysql/my.cnf
+      - ./docker/services/mysql/data:/var/lib/mysql/
+      - ./docker/services/mysql/conf/my.cnf:/etc/mysql/my.cnf
     networks:
       - laravel

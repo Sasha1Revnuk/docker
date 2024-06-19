@@ -1,10 +1,7 @@
 PHP_CONTAINER=app
 
-env:
-	cp src/.env.example src/.env
-
 mysql_777:
-	sudo chmod -R 777 docker/mysql
+	sudo chmod -R 777 docker/services/mysql
 
 init:
 	docker compose build

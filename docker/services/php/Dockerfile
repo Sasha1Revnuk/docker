@@ -42,7 +42,7 @@ RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl gd intl
 RUN docker-php-ext-configure intl
 RUN docker-php-ext-configure gd --enable-gd --with-freetype=/usr/include/ --with-webp=/usr/include/  --with-jpeg=/usr/include/
 RUN docker-php-ext-install -j$(nproc) gd
-
+#RUN docker-php-ext-enable imagick
 # Install composer
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
