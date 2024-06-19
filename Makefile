@@ -1,5 +1,4 @@
 PHP_CONTAINER=app
-NODE_CONTAINER=node
 
 env:
 	cp src/.env.example src/.env
@@ -16,8 +15,8 @@ init:
 	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "php artisan storage:link"
 	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "php artisan migrate"
 	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "php artisan db:seed"
-	docker compose exec $(NODE_CONTAINER) bash -c "npm i"
-	docker compose exec $(NODE_CONTAINER) bash -c "npm run dev"
+	docker compose exec $(PHP_CONTAINER) bash -c "npm i"
+	docker compose exec $(PHP_CONTAINER) bash -c "npm run dev"
 build:
 	docker compose build
 
@@ -25,10 +24,10 @@ up:
 	docker compose up -d
 
 dev:
-	docker compose exec $(NODE_CONTAINER) bash -c "npm run dev"
+	docker compose exec $(PHP_CONTAINER) bash -c "npm run dev"
 
 prod:
-	docker compose exec $(NODE_CONTAINER) bash -c "npm run build"
+	docker compose exec $(PHP_CONTAINER) bash -c "npm run build"
 
 down:
 	docker compose down

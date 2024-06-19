@@ -26,7 +26,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     sudo \
     libicu-dev \
-    libmagickwand-dev --no-install-recommends
+    libmagickwand-dev --no-install-recommends \
+     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+     && apt-get install -y nodejs \
+     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 # Clear cache
