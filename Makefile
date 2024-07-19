@@ -1,19 +1,27 @@
+# Define variables
 PHP_CONTAINER=app
 
-mysql_777:
-	sudo chmod -R 777 docker/services/mysql
 
 init:
+	cp .env.example .env
+	cp -r ./docker-sources ./docker
+	make sync-env
+	mv docker/docker-compose.yml docker-compose.yml
+	rm docker/Makefile
+	rm docker/.env
+
+
+docker-init:
 	docker compose build
 	docker compose up -d
 	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "composer install"
 	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "php artisan key:generate"
-	#docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "sudo chmod -R 777 storage"
+	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "sudo chmod -R 777 storage/framework"
+	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "sudo chmod -R 777 storage/logs"
 	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "php artisan storage:link"
-	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "php artisan migrate"
-	docker compose exec -u root -t -i $(PHP_CONTAINER) bash -c "php artisan db:seed"
 	docker compose exec $(PHP_CONTAINER) bash -c "npm i"
-	docker compose exec $(PHP_CONTAINER) bash -c "npm run dev"
+	docker compose exec $(PHP_CONTAINER) bash -c "npm run build"
+
 build:
 	docker compose build
 
@@ -32,5 +40,19 @@ down:
 php:
 	docker compose exec -u root -t -i $(PHP_CONTAINER) bash
 
-node:
-	docker compose exec $(NODE_CONTAINER) bash
+
+.PHONY: sync-env
+sync-env:
+	@echo "Syncing environment variables from docker/.env to .env"
+	@while IFS= read -r line; do \
+		if [ -n "$$line" ]; then \
+			variable=$$(echo $$line | cut -d '=' -f 1); \
+			value=$$(echo $$line | cut -d '=' -f 2-); \
+			if grep -q "^$$variable=" .env; then \
+				sed -i.bak "s/^$$variable=.*/$$variable=$$value/" .env; \
+			else \
+				echo "$$variable=$$value" >> .env; \
+			fi; \
+		fi; \
+	done < docker/.env
+	@rm -f .env.bak
