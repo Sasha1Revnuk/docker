@@ -1,2 +1,2 @@
 .idea
-docker/services/mysql/data
+docker-resources/services/mysql/data
